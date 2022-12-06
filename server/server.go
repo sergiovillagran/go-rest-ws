@@ -8,6 +8,8 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/sergiovillagran/rest-ws/database"
+	"github.com/sergiovillagran/rest-ws/repository"
 )
 
 type Config struct {
@@ -53,6 +55,13 @@ func NewServer(ctx context.Context, config *Config) (*Broker, error) {
 func (b *Broker) Start(binder func(s Server, r *mux.Router)) {
 	b.router = mux.NewRouter()
 	binder(b, b.router)
+
+	repo, err := database.NewPostgresRepository(b.config.DatabaseUrl)
+	if err != nil {
+		log.Fatal("Impossible connect to the db")
+	}
+
+	repository.SetRepository(repo)
 	log.Println("Starting server on port", b.config.Port)
 
 	if err := http.ListenAndServe(fmt.Sprintf(":%s", b.config.Port), b.router); err != nil {
