@@ -41,7 +41,7 @@ func (repo *PostgresRepository) GetUserById(ctx context.Context, id string) (*mo
 	var user = models.User{}
 
 	for rows.Next() {
-		if err := rows.Scan(&user.Id, &user.Email); err != nil {
+		if err := rows.Scan(&user.Id, &user.Email, &user.Password); err != nil {
 			return &user, nil
 		}
 	}
