@@ -30,7 +30,7 @@ func (repo *PostgresRepository) InsertUser(ctx context.Context, user *models.Use
 }
 
 func (repo *PostgresRepository) GetUserById(ctx context.Context, id string) (*models.User, error) {
-	rows, err := repo.db.QueryContext(ctx, "SELECT(Id, Email) FROM users WHERE id=$1", id)
+	rows, err := repo.db.QueryContext(ctx, "SELECT id, email FROM users WHERE id = $1", id)
 
 	defer func() {
 		err = rows.Close()
@@ -40,9 +40,8 @@ func (repo *PostgresRepository) GetUserById(ctx context.Context, id string) (*mo
 	}()
 
 	var user = models.User{}
-
 	for rows.Next() {
-		if err := rows.Scan(&user.Id, &user.Email, &user.Password); err != nil {
+		if err := rows.Scan(&user.Id, &user.Email); err != nil {
 			return &user, nil
 		}
 	}
