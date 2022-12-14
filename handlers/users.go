@@ -108,7 +108,7 @@ func LoginHandler(s server.Server) http.HandlerFunc {
 			},
 		}
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		tokenString, err := token.SignedString(s.Config().JWTSecret)
+		tokenString, err := token.SignedString([]byte(s.Config().JWTSecret))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
