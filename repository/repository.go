@@ -6,16 +6,17 @@ import (
 	"github.com/sergiovillagran/rest-ws/models"
 )
 
-type UserRepository interface {
-	InsertUser(ctx context.Context, user *models.User) error
+type Repository interface {
+	InsertPost(ctx context.Context, post *models.Post) error
 	GetUserById(ctx context.Context, Id string) (*models.User, error)
 	GetUserByEmail(ctx context.Context, Email string) (*models.User, error)
+	InsertUser(ctx context.Context, user *models.User) error
 	Close() error
 }
 
-var Implementation UserRepository
+var Implementation Repository
 
-func SetRepository(repository UserRepository) {
+func SetRepository(repository Repository) {
 	Implementation = repository
 }
 
@@ -29,6 +30,10 @@ func GetUser(ctx context.Context, Id string) (*models.User, error) {
 
 func GetUserByEmail(ctx context.Context, Email string) (*models.User, error) {
 	return Implementation.GetUserByEmail(ctx, Email)
+}
+
+func InsertPost(ctx context.Context, post *models.Post) error {
+	return Implementation.InsertPost(ctx, post)
 }
 
 func Close() error {
