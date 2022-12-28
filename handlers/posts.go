@@ -115,5 +115,13 @@ func ListPostsHandler(s server.Server) http.HandlerFunc {
 			}
 		}
 
-		post, err := repository.ListPosts(r.Context(), page)
+		posts, err := repository.ListPosts(r.Context(), page)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		json.NewEncoder(w).Encode(posts)
+	}
 }
