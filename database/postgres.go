@@ -133,5 +133,5 @@ func (repo *PostgresRepository) ListPosts(ctx context.Context, page uint64) ([]*
 		return nil, err
 	}
 
-	return &post, nil
+	return posts, nil
 }
