@@ -24,7 +24,7 @@ type InsertPostResponse struct {
 	PostContent string `json:"post_content"`
 }
 
-func InserPostHandler(s server.Server) http.HandlerFunc {
+func InsertPostHandler(s server.Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tokenString := strings.TrimSpace(r.Header.Get("Authorization"))
 
@@ -72,6 +72,13 @@ func InserPostHandler(s server.Server) http.HandlerFunc {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
+
+			var postMessage = models.WebSocketMessage{
+				Type:    "Post created",
+				Payload: post,
+			}
+
+			s.Hub().Broadcast(postMessage, nil)
 
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(InsertPostResponse{

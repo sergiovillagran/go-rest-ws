@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"sync"
@@ -29,20 +30,23 @@ func NewHub() *Hub {
 }
 
 func (hub *Hub) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
+	log.Println("Holaaaa")
 	socket, err := upgrader.Upgrade(w, r, nil)
 
 	if err != nil {
 		log.Println(err)
-		http.Error(w, "Could not   open web socket connection", http.StatusBadRequest)
+		http.Error(w, "Could not open web socket connection", http.StatusBadRequest)
+		return
 	}
 
 	client := NewClient(hub, socket)
+	hub.register <- client
 
 	go client.Write()
 }
 
 func (hub *Hub) onConnect(client *Client) {
-	log.Println("Clent connected", client.socket.RemoteAddr())
+	log.Println("Client connected", client.socket.RemoteAddr())
 
 	hub.mutex.Lock()
 	defer hub.mutex.Unlock()
@@ -79,5 +83,14 @@ func (hub *Hub) Run() {
 		hub.onConnect(client)
 	case client := <-hub.unregister:
 		hub.onDisonnect(client)
+	}
+}
+
+func (hub *Hub) Broadcast(message interface{}, ignore *Client) {
+	data, _ := json.Marshal(message)
+	for _, client := range hub.clients {
+		if client != ignore {
+			client.outbound <- data
+		}
 	}
 }

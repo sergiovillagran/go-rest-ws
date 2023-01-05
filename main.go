@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -11,7 +12,6 @@ import (
 	"github.com/sergiovillagran/rest-ws/handlers"
 	"github.com/sergiovillagran/rest-ws/middleware"
 	"github.com/sergiovillagran/rest-ws/server"
-	"github.com/sergiovillagran/rest-ws/websocket"
 )
 
 func main() {
@@ -39,18 +39,15 @@ func main() {
 }
 
 func BindRoutes(s server.Server, r *mux.Router) {
-	hub := websocket.NewHub()
-
 	r.Use(middleware.CheckAuth(s))
 
 	r.HandleFunc("/", handlers.HomeHandler(s)).Methods(http.MethodGet)
 	r.HandleFunc("/signup", handlers.SignUpHandler(s)).Methods(http.MethodPost)
 	r.HandleFunc("/login", handlers.LoginHandler(s)).Methods(http.MethodPost)
 	r.HandleFunc("/me", handlers.MeHandler(s)).Methods(http.MethodGet)
-	r.HandleFunc("/posts", handlers.InserPostHandler(s)).Methods(http.MethodPost)
+	r.HandleFunc("/posts", handlers.InsertPostHandler(s)).Methods(http.MethodPost)
 	r.HandleFunc("/posts/{id}", handlers.GetPostByIdHandler(s)).Methods(http.MethodGet)
 	r.HandleFunc("/posts", handlers.ListPostsHandler(s)).Methods(http.MethodGet)
 
-	go hub.Run()
-	r.HandleFunc("/ws", hub.HandleWebSocket)
+	r.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) { fmt.Println("Hola ws") })
 }
