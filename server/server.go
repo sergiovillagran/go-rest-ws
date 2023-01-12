@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -74,7 +73,7 @@ func (b *Broker) Start(binder func(s Server, r *mux.Router)) {
 
 	go b.hub.Run()
 
-	if err := http.ListenAndServe(fmt.Sprintf(":%s", b.config.Port), b.router); err != nil {
+	if err := http.ListenAndServe("localhost"+b.config.Port, b.router); err != nil {
 		log.Fatal("Listen and Serve: ", err)
 	}
 }

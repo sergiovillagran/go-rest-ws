@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -49,5 +48,5 @@ func BindRoutes(s server.Server, r *mux.Router) {
 	r.HandleFunc("/posts/{id}", handlers.GetPostByIdHandler(s)).Methods(http.MethodGet)
 	r.HandleFunc("/posts", handlers.ListPostsHandler(s)).Methods(http.MethodGet)
 
-	r.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) { fmt.Println("Hola ws") })
+	r.HandleFunc("/ws", s.Hub().HandleWebSocket)
 }
